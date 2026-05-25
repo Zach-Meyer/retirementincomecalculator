@@ -1,9 +1,566 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Retirement Income Calculator</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Centrelink Age Pension Calculator</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 30px;
+      color: #333;
+    }
+
+    .main-layout {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 40px;
+    }
+
+    .input-section {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    select, input {
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-family: inherit;
+    }
+
+    select:focus, input:focus {
+      outline: none;
+      border-color: #0066cc;
+      box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+    }
+
+    .results-section {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .asset-test {
+      padding: 20px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      font-size: 16px;
+    }
+
+    .asset-test.eligible {
+      background: #e8f5e9;
+      border-left: 4px solid #4caf50;
+      color: #2e7d32;
+    }
+
+    .asset-test.ineligible {
+      background: #ffebee;
+      border-left: 4px solid #f44336;
+      color: #c62828;
+    }
+
+    .asset-test strong {
+      display: block;
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 400px;
+      width: 100%;
+    }
+
+    .disclaimer {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 4px;
+      padding: 15px;
+      margin-bottom: 30px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #856404;
+    }
+
+    .disclaimer strong {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 700;
+    }
+
+    @media (max-width: 768px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .input-section {
+        margin-bottom: 30px;
+        padding-bottom: 30px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .container {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <h1>Retirement Income Calculator</h1>
+  <div class="container">
+    <h1>Centrelink Age Pension Calculator</h1>
+    
+    <div class="disclaimer">
+      <strong>Disclaimer</strong>
+      This calculator is provided for educational and planning purposes only and should not be relied upon as professional financial advice. Results are indicative and based on assumptions that may not reflect your actual circumstances. Centrelink eligibility criteria, asset tests, and income limits are subject to change. Always consult with a qualified financial adviser or contact Centrelink directly for accurate, personalised guidance regarding your age pension eligibility and entitlements.
+    </div>
+
+    <div class="main-layout">
+      <div class="input-section">
+        <div class="form-group">
+          <label for="age">Age</label>
+          <select id="age">
+            <option value="65" selected>65</option>
+            <option value="66">66</option>
+            <option value="67">67</option>
+            <option value="68">68</option>
+            <option value="69">69</option>
+            <option value="70">70</option>
+            <option value="71">71</option>
+            <option value="72">72</option>
+            <option value="73">73</option>
+            <option value="74">74</option>
+            <option value="75">75</option>
+            <option value="76">76</option>
+            <option value="77">77</option>
+            <option value="78">78</option>
+            <option value="79">79</option>
+            <option value="80">80</option>
+            <option value="81">81</option>
+            <option value="82">82</option>
+            <option value="83">83</option>
+            <option value="84">84</option>
+            <option value="85">85</option>
+            <option value="86">86</option>
+            <option value="87">87</option>
+            <option value="88">88</option>
+            <option value="89">89</option>
+            <option value="90">90</option>
+            <option value="91">91</option>
+            <option value="92">92</option>
+            <option value="93">93</option>
+            <option value="94">94</option>
+            <option value="95">95</option>
+            <option value="96">96</option>
+            <option value="97">97</option>
+            <option value="98">98</option>
+            <option value="99">99</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="superannuation">Superannuation Balance (K)</label>
+          <input 
+            type="number" 
+            id="superannuation" 
+            placeholder="0"
+            min="0"
+            step="10"
+            value="500"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="income-goal">Annual Income Goal ($)</label>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <input 
+              type="range" 
+              id="income-goal" 
+              min="40000"
+              max="100000"
+              step="1000"
+              value="60000"
+              style="flex: 1;"
+            >
+            <span id="income-goal-display" style="min-width: 70px; text-align: right; font-weight: 600; color: #333;">$60K</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="gfc-checkbox">Worse case scenario</label>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <input type="checkbox" id="gfc-checkbox">
+            <label for="gfc-checkbox" style="font-weight: 400; text-transform: none;">Simulate GFC just after retirement (–30% balance)</label>
+          </div>
+        </div>
+      </div>
+      <div class="results-section" id="results-section" style="display: none;">
+        <div id="asset-test-result" class="asset-test"></div>
+        <div>
+          <h2 style="font-size: 16px; font-weight: 600; color: #555; margin-bottom: 15px;">Annual Income (inflated)</h2>
+          <div class="chart-container">
+            <canvas id="pension-chart"></canvas>
+          </div>
+        </div>
+        <div>
+          <h2 style="font-size: 16px; font-weight: 600; color: #555; margin-bottom: 15px;">Superannuation Balance</h2>
+          <div class="chart-container">
+            <canvas id="superannuation-chart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Centrelink asset test and pension calculation parameters (single person)
+    const ASSET_TEST_FULL_PENSION = 321500; // Assets for full pension
+    const ASSET_TEST_NO_PENSION = 647500; // Assets for no pension
+    const BASE_PENSION_ANNUAL = 16000; // Approximate base annual pension
+    const INVESTMENT_RETURN = 0.05; // 5% annual return
+    
+    // Deeming rules - assumed income rates on financial assets
+    const DEEMING_THRESHOLD = 54800; // Assets below this threshold
+    const DEEMING_RATE_LOW = 0.01; // 1% annual on assets up to threshold
+    const DEEMING_RATE_HIGH = 0.02; // 2% annual on assets above threshold
+    const INCOME_FREE_AMOUNT = 4096; // Annual income free area for single person
+    const INCOME_TAPER_RATE = 0.5; // Reduce pension by $0.50 per $1 over free amount
+
+    function formatAmountK(value) {
+      return '$' + Math.round(value / 1000) + 'K';
+    }
+
+    function calculateDeemedIncome(assets) {
+      // Calculate income from deeming rules
+      if (assets <= DEEMING_THRESHOLD) {
+        return assets * DEEMING_RATE_LOW;
+      } else {
+        const lowIncome = DEEMING_THRESHOLD * DEEMING_RATE_LOW;
+        const highIncome = (assets - DEEMING_THRESHOLD) * DEEMING_RATE_HIGH;
+        return lowIncome + highIncome;
+      }
+    }
+
+    function getMinimumDrawdownRate(age) {
+      if (age < 65) return 0.04;
+      if (age <= 74) return 0.05;
+      if (age <= 79) return 0.06;
+      if (age <= 84) return 0.07;
+      if (age <= 89) return 0.09;
+      if (age <= 94) return 0.11;
+      return 0.14;
+    }
+
+    const ageSelect = document.getElementById('age');
+    const superInput = document.getElementById('superannuation');
+    const incomeGoalInput = document.getElementById('income-goal');
+    const incomeGoalDisplay = document.getElementById('income-goal-display');
+    const gfcCheckbox = document.getElementById('gfc-checkbox');
+    const resultsSection = document.getElementById('results-section');
+    const assetTestResult = document.getElementById('asset-test-result');
+
+    let pensionChart = null;
+    let superannuationChart = null;
+
+    // Update income goal display when slider changes
+    incomeGoalInput.addEventListener('input', function() {
+      incomeGoalDisplay.textContent = '$' + Math.round(this.value / 1000) + 'K';
+      calculatePension();
+    });
+
+    function calculatePensionAmount(assets) {
+      // Asset test
+      let pensionFromAssetTest;
+      if (assets <= ASSET_TEST_FULL_PENSION) {
+        pensionFromAssetTest = BASE_PENSION_ANNUAL;
+      } else if (assets >= ASSET_TEST_NO_PENSION) {
+        pensionFromAssetTest = 0;
+      } else {
+        // Linear interpolation between full and no pension
+        const range = ASSET_TEST_NO_PENSION - ASSET_TEST_FULL_PENSION;
+        const excess = assets - ASSET_TEST_FULL_PENSION;
+        pensionFromAssetTest = BASE_PENSION_ANNUAL * (1 - excess / range);
+      }
+
+      // Income test (deeming rules)
+      const deemedIncome = calculateDeemedIncome(assets);
+      const assessableIncome = Math.max(0, deemedIncome - INCOME_FREE_AMOUNT);
+      const pensionReductionFromIncome = assessableIncome * INCOME_TAPER_RATE;
+      const pensionFromIncomeTest = Math.max(0, BASE_PENSION_ANNUAL - pensionReductionFromIncome);
+
+      // Return the result from whichever test is more restrictive (lower pension)
+      return Math.min(pensionFromAssetTest, pensionFromIncomeTest);
+    }
+
+    function calculatePension() {
+      const age = parseInt(ageSelect.value);
+      const superannuationK = parseFloat(superInput.value) || 0;
+      const superannuation = superannuationK * 1000; // Convert K to dollars
+      const incomeGoal = parseFloat(incomeGoalInput.value) || 0;
+      const gfcScenario = gfcCheckbox.checked;
+
+      if (!age) {
+        resultsSection.style.display = 'none';
+        return;
+      }
+
+      const yearsToProjection = 100 - age + 1; // Project up to age 100
+
+      resultsSection.style.display = 'block';
+
+      // Update asset test result
+      const initialPension = calculatePensionAmount(superannuation);
+      const deemedIncome = calculateDeemedIncome(superannuation);
+      const assessableIncome = Math.max(0, deemedIncome - INCOME_FREE_AMOUNT);
+      
+      if (initialPension > 0) {
+        assetTestResult.className = 'asset-test eligible';
+        assetTestResult.innerHTML = `
+          <strong>✓ Eligible for age pension currently</strong>
+          Assets: ${formatAmountK(superannuation)}
+          Deemed income: ${formatAmountK(deemedIncome)} (Assessable: ${formatAmountK(assessableIncome)})
+          Annual Pension: ${formatAmountK(initialPension)}
+        `;
+      } else {
+        assetTestResult.className = 'asset-test ineligible';
+        assetTestResult.innerHTML = `
+          <strong>✗ Ineligible for age pension currently</strong>
+          Assets: ${formatAmountK(superannuation)}
+          Deemed income: ${formatAmountK(deemedIncome)} (Exceeds thresholds)
+        `;
+      }
+
+      // Generate projections year by year
+      const years = [];
+      const pensionAmounts = [];
+      const withdrawals = [];
+      const superannuationBalances = [];
+      let currentBalance = superannuation;
+
+      for (let i = 0; i < yearsToProjection; i++) {
+        const projectedAge = age + i;
+        years.push(projectedAge);
+
+        // Apply investment return
+        currentBalance = currentBalance * (1 + INVESTMENT_RETURN);
+
+        // Apply a one-time GFC shock in the second year
+        if (gfcScenario && i === 1) {
+          currentBalance = currentBalance * 0.7;
+        }
+
+        // Calculate pension based on CURRENT balance
+        const pensionThisYear = calculatePensionAmount(currentBalance);
+        pensionAmounts.push(pensionThisYear);
+
+        // Calculate withdrawal amount using the minimum drawdown rate for this age
+        const drawdownRate = getMinimumDrawdownRate(projectedAge);
+        const minimumWithdrawal = currentBalance * drawdownRate;
+        let withdrawal = 0;
+
+        if (incomeGoal > 0) {
+          const incomeNeeded = Math.max(0, incomeGoal - pensionThisYear);
+          // Withdraw at least the mandated drawdown rate and also enough to meet the income goal
+          withdrawal = Math.max(minimumWithdrawal, Math.min(currentBalance, incomeNeeded));
+        } else {
+          withdrawal = minimumWithdrawal;
+        }
+
+        // Subtract withdrawal from balance
+        currentBalance = Math.max(0, currentBalance - withdrawal);
+        superannuationBalances.push(currentBalance);
+        withdrawals.push(withdrawal);
+      }
+
+      updatePensionChart(years, pensionAmounts, withdrawals);
+      updateSuperannuationChart(years, superannuationBalances);
+    }
+
+    function updatePensionChart(years, pensionAmounts, withdrawals) {
+      const ctx = document.getElementById('pension-chart').getContext('2d');
+
+      if (pensionChart) {
+        pensionChart.destroy();
+      }
+
+      pensionChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: years,
+          datasets: [
+            {
+              label: 'Age Pension',
+              data: pensionAmounts,
+              backgroundColor: '#4caf50',
+              borderColor: '#2e7d32',
+              borderWidth: 0,
+              borderRadius: 4,
+            },
+            {
+              label: 'Superannuation Withdrawal',
+              data: withdrawals,
+              backgroundColor: '#ff9800',
+              borderColor: '#e65100',
+              borderWidth: 0,
+              borderRadius: 4,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          indexAxis: 'x',
+          plugins: {
+            legend: {
+              display: true,
+              labels: {
+                font: { size: 14, weight: 600 },
+                padding: 20,
+                color: '#555',
+              },
+            },
+          },
+          scales: {
+            x: {
+              stacked: true,
+              ticks: {
+                font: { size: 12 },
+                color: '#999',
+              },
+              grid: {
+                display: false,
+              },
+            },
+            y: {
+              stacked: true,
+              beginAtZero: true,
+              ticks: {
+                callback: function (value) {
+                  return formatAmountK(value);
+                },
+                font: { size: 12 },
+                color: '#999',
+              },
+              grid: {
+                color: '#f0f0f0',
+                drawBorder: false,
+              },
+            },
+          },
+        },
+      });
+    }
+
+    function updateSuperannuationChart(years, balances) {
+      const ctx = document.getElementById('superannuation-chart').getContext('2d');
+
+      if (superannuationChart) {
+        superannuationChart.destroy();
+      }
+
+      superannuationChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: years,
+          datasets: [
+            {
+              label: 'Superannuation Balance',
+              data: balances,
+              backgroundColor: '#2196f3',
+              borderColor: '#1565c0',
+              borderWidth: 0,
+              borderRadius: 4,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          indexAxis: 'x',
+          plugins: {
+            legend: {
+              display: false,
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function (value) {
+                  return formatAmountK(value);
+                },
+                font: { size: 12 },
+                color: '#999',
+              },
+              grid: {
+                color: '#f0f0f0',
+                drawBorder: false,
+              },
+            },
+            x: {
+              ticks: {
+                font: { size: 12 },
+                color: '#999',
+              },
+              grid: {
+                display: false,
+              },
+            },
+          },
+        },
+      });
+    }
+
+    // Add event listeners
+    ageSelect.addEventListener('change', calculatePension);
+    superInput.addEventListener('input', calculatePension);
+    gfcCheckbox.addEventListener('change', calculatePension);
+
+    // Load calculator with default values on page open
+    calculatePension();
+  </script>
 </body>
 </html>
